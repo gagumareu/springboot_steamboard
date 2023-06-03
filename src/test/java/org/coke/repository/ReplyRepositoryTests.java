@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.IntStream;
 
 @SpringBootTest
@@ -30,6 +32,16 @@ public class ReplyRepositoryTests {
                     .build();
 
             replyRepository.save(reply);
+        });
+    }
+
+    @Test
+    public void getList(){
+
+        List<Reply> result = replyRepository.getRepliesByBoardOrderByRno(Board.builder().bno(311L).build());
+
+        result.forEach(i -> {
+            System.out.println(i);
         });
     }
 }

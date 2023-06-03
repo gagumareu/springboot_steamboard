@@ -8,7 +8,61 @@
 <body>
 
 <th:block th:fragment="content">
+
     <h1>Read Board Page</h1>
+
+    <div class="form-group">
+        <label>NO</label>
+        <input class="form-control" type="text" name="bno" th:value="${dto.bno}" readonly>
+    </div>
+
+    <div class="form-group">
+        <label>TITLE</label>
+        <input class="form-control" type="text" name="bno" th:value="${dto.title}" readonly>
+    </div>
+
+    <div class="form-group">
+        <label>CONTENT</label>
+        <textarea name="conetent" class="form-control" rows="5" readonly>[[${dto.content}]]</textarea>
+    </div>
+
+    <div class="form-group">
+        <label>NAME</label>
+        <input class="form-control" type="text" name="memberName" th:value="${dto.memberName}" readonly>
+    </div>
+
+    <div class="form-group">
+        <label>EMAIL</label>
+        <input class="form-control" type="text" name="memberEmail" th:value="${dto.memberEmail}" readonly>
+    </div>
+
+    <div class="form-group">
+        <label>REGISTRATION DATE</label>
+        <input class="form-control" type="text" name="bno" th:value="${#temporals.format(dto.regDate, 'yyyy/MM/dd')}" readonly>
+    </div>
+
+    <div class="form-group">
+        <label>UPDATE DATE</label>
+        <input class="form-control" type="text" name="bno" th:value="${#temporals.format(dto.modDate, 'yyyy/MM/dd')}" readonly>
+    </div>
+
+    <a th:href="@{/board/update(bno=${dto.bno}, page=${pageRequestDTO.page} )}">
+        <button type="button" class="btn btn-primary">MODIFY</button>
+    </a>
+    <a th:href="@{/board/list(page=${pageRequestDTO.page})}">
+        <button type="button" class="btn btn-danger">LIST</button>
+    </a>
+
+    <script th:javascript>
+
+        $(document).ready(function (){
+
+
+
+        });
+
+    </script>
+
 </th:block>
 
 </body>

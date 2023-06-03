@@ -17,6 +17,50 @@
     </h1>
 
 
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">NO</th>
+            <th scope="col">TITLE</th>
+            <th scope="col">MEMBER</th>
+            <th scope="col">REGDATE</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="dto : ${boardList.dtoList}">
+            <th scope="row">[[${dto.bno}]]</th>
+            <td>
+                <a th:href="@{/board/read(bno=${dto.bno}, page=${boardList.page})}">
+                    [[${dto.title}]] [<b th:text="${dto.replyCount}"></b>]
+                </a>
+            </td>
+            <td>[[${dto.memberName}]] <small>[[${dto.memberEmail}]]</small></td>
+            <td>[[${#temporals.format(dto.regDate, 'yyyy/MM/dd')}]]</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <ul class="pagination h-100 justify-content-center align-items-center">
+        <li class="page-item" th:if="${boardList.prev}">
+            <a class="page-link" th:href="@{/board/list(page=${boardList.start -1})}" tabindex="-1">
+                PREVIOUS
+            </a>
+        </li>
+
+        <li th:class="'page-item ' + ${boardList.page == page ? 'active' : ''}" th:each="page : ${boardList.pageList}">
+            <a class="page-link" th:href="@{/board/list(page=${page} )}">
+                [[${page}]]
+            </a>
+        </li>
+
+        <li class="page-item" th:if="${boardList.next}">
+            <a class="page-link" th:href="@{/board/list(page=${boardList.end +1} )}">
+                NEXT
+            </a>
+        </li>
+    </ul>
+
 
 
 </th:block>

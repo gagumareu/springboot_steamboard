@@ -14,6 +14,7 @@ public interface BoardService {
     void removeWithRepliesAndImages(Long bno);
     void modify(BoardDTO boardDTO);
 
+
     default Board dtoToEntity(BoardDTO boardDTO){
 
         Member member = Member.builder().email(boardDTO.getMemberEmail()).build();
@@ -34,8 +35,8 @@ public interface BoardService {
                 .bno(board.getBno())
                 .title(board.getTitle())
                 .content(board.getContent())
-                .MemberEmail(member.getEmail())
-                .MemberName(member.getName())
+                .memberEmail(member.getEmail())
+                .memberName(member.getName())
                 .regDate(board.getRegDate())
                 .modDate(board.getModDate())
                 .replyCount(replyCount.intValue())

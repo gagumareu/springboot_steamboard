@@ -23,7 +23,7 @@ public class BoardServiceTests {
         BoardDTO boardDTO = BoardDTO.builder()
                         .title("testing service for inserting")
                         .content("testing service for inserting")
-                                .MemberEmail("user13@email.com")
+                                .memberEmail("user13@email.com")
                                         .build();
 
         boardService.register(boardDTO);

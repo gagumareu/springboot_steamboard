@@ -34,6 +34,8 @@ public class BoardServiceImpl implements BoardService{
 
         Board board = dtoToEntity(boardDTO);
 
+        log.info(board);
+
         boardRepository.save(board);
 
         return board.getBno();
@@ -42,9 +44,7 @@ public class BoardServiceImpl implements BoardService{
     @Override
     public PageResultDTO<BoardDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
 
-        Function<Object[], BoardDTO> fn = (en -> entityToDTO(
-                (Board) en[0], (Member) en[1], (Long) en[2]
-        ));
+        Function<Object[], BoardDTO> fn = (en -> entityToDTO((Board) en[0], (Member) en[1], (Long) en[2]));
 
         Page<Object[]> result =
                 boardRepository.getListWithReplyCount(pageRequestDTO.getPageable(Sort.by("bno").descending()));

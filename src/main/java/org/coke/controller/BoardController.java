@@ -21,9 +21,9 @@ public class BoardController {
     @GetMapping("/list")
     public void getList(PageRequestDTO pageRequestDTO, Model model){
 
-        log.info("board List on controller");
+        log.info("************ board List on controller ************");
 
-        model.addAttribute("List", boardService.getList(pageRequestDTO));
+        model.addAttribute("boardList", boardService.getList(pageRequestDTO));
     }
 
     @GetMapping("/register")
@@ -34,13 +34,15 @@ public class BoardController {
     @PostMapping("/register")
     public String register(BoardDTO boardDTO, RedirectAttributes redirectAttributes){
 
-        log.info("board register on controller");
+        log.info("************ board register on controller ************");
 
         log.info("boardDTO: " + boardDTO);
 
         Long bno = boardService.register(boardDTO);
 
         redirectAttributes.addFlashAttribute("msg", bno);
+
+        redirectAttributes.addAttribute("bno", bno);
 
         return "redirect:/board/read";
     }
@@ -49,7 +51,8 @@ public class BoardController {
     public void read(@RequestParam("bno") Long bno,
                      @ModelAttribute("pageRequestDTO")PageRequestDTO pageRequestDTO, Model model){
 
-        log.info("board read on controller");
+        log.info("************ board read on controller ************");
+        log.info("pageRequestDTO: " + pageRequestDTO);
 
         BoardDTO boardDTO = boardService.getBoard(bno);
 
@@ -58,10 +61,10 @@ public class BoardController {
         model.addAttribute("dto", boardDTO);
     }
 
-    @DeleteMapping("/remove")
+    @PostMapping("/remove")
     public String delete(Long bno, RedirectAttributes redirectAttributes){
 
-        log.info("board delete on controller");
+        log.info("************ board delete on controller ************");
 
         boardService.removeWithRepliesAndImages(bno);
 
@@ -70,16 +73,21 @@ public class BoardController {
         return "redirect:/board/list";
     }
 
-    @PutMapping("/update")
+    @PostMapping("/update")
     public String update(BoardDTO boardDTO, @ModelAttribute("pageRequestDTO") PageRequestDTO pageRequestDTO,
                          RedirectAttributes redirectAttributes){
 
-        log.info("board update on controller");
+        log.info("************ board update on controller ************");
         log.info("boardDTO: " + boardDTO);
+        log.info("pageRequestDTO: " + pageRequestDTO);
 
         boardService.modify(boardDTO);
 
-        redirectAttributes.addFlashAttribute("bno", boardDTO.getBno());
+        redirectAttributes.addAttribute("bno", boardDTO.getBno());
+
+        redirectAttributes.addAttribute("page", pageRequestDTO.getPage());
+//        redirectAttributes.addAttribute("page", pageRequestDTO.getType());
+//        redirectAttributes.addAttribute("keyword", pageRequestDTO.getKeyword());
 
         return "redirect:/board/read";
     }

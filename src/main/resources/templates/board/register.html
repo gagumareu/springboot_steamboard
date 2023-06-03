@@ -9,6 +9,28 @@
 
 <th:block th:fragment="content">
     <h1>Register Board Page</h1>
+
+    <form th:action="@{/board/register}" method="post">
+
+        <div class="form-group">
+            <label>TITLE</label>
+            <input type="text" name="title" placeholder="WRITE YOUR NAME DOWN" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>CONTENT</label>
+            <textarea class="form-control" rows="5" name="content"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>WRITER</label>
+            <input name="memberEmail" type="text" class="form-control" placeholder="WRITE DOWN YOUR EMAIL">
+        </div>
+
+        <button class="btn btn-outline-primary" type="submit">REGISTER</button>
+
+    </form>
+
 </th:block>
 
 </body>
