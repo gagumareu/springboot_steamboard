@@ -21,7 +21,12 @@ public class ReplyServiceImpl implements ReplyService{
     @Override
     public Long register(ReplyDTO replyDTO) {
 
+        log.info("---------saving a reply -----------");
+        log.info("replyDTO: " + replyDTO);
+
         Reply reply = dtoToEntity(replyDTO);
+
+        replyRepository.save(reply);
 
         return reply.getRno();
     }
@@ -29,7 +34,7 @@ public class ReplyServiceImpl implements ReplyService{
     @Override
     public List<ReplyDTO> getList(Long bno) {
 
-        System.out.println("---------service Impl -----------");
+        log.info("---------getting reply List -----------");
 
         List<Reply> result = replyRepository.getRepliesByBoardOrderByRno(Board.builder().bno(bno).build());
 

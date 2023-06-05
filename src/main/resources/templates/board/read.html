@@ -53,12 +53,219 @@
         <button type="button" class="btn btn-danger">LIST</button>
     </a>
 
+    <div class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div> <!-- modal-header -->
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="form-group">
+                            <input class="form-control" type="text" name="text" placeholder="write down reply...">
+                        </div>
+
+                        <div class="form-group">
+                            <input class="form-control" type="hidden" name="memberName">
+                        </div>
+
+                        <div class="form-group">
+                            <input id="memberEmail" class="form-control" type="text" name="memberEmail" placeholder="write down your email...">
+                        </div>
+                        <input type="hidden" name="rno">
+                    </div>
+                </div> <!-- modal-body -->
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger replyRemove">Remove</button>
+                    <button type="button" class="btn btn-warning replyModify">Modify</button>
+                    <button type="button" class="btn btn-primary replySave">Save</button>
+                    <button type="button" class="btn btn-outline-secondary replyClose" data-dismiss="modal">Close</button>
+                </div>  <!-- modal-footer -->
+            </div>
+        </div> <!-- modal-dialog -->
+    </div> <!-- modal -->
+
+
+    <div>
+        <div class="mt-4">
+            <h5><span class="badge badge-info addReply">ADD REPLY</span></h5>
+            <h5><span class="badge badge-secondary replyCount">REPLY COUNT [[${dto.replyCount}]]</span></h5>
+        </div>
+        <div class="list-group replyList">
+
+        </div>
+    </div>
+
     <script th:javascript>
 
         $(document).ready(function (){
 
+            var bno = [[${dto.bno}]];
+
+            var modal = $(".modal");
+            var replyList = $(".replyList");
+
+            var inputText = $("input[name='text']");
+            var inputWriter = $("input[name='memberEmail']");
+
+            function formatTime(str){
+
+                var data = new Date();
+
+                return data.getFullYear() + "/" +
+                    (data.getMonth() +1) + "/" +
+                    data.getHours() + ":" +
+                    data.getMinutes() + ":" +
+                    data.getMinutes();
+            }
+
+            function loadJSONDate(){
+
+                $.getJSON('/replies/board/' + bno, function (arr){
+
+                    console.log(arr);
+
+                    var str = "";
+
+                    $.each(arr, function (idx, reply){
+                        str += '<div class="card-body" data-rno="'+reply.rno+'" data-email="'+reply.memberEmail+'"><b>'+reply.rno+'</b> ';
+                        str += '<h5 class="card-title">'+reply.text+'</h5>';
+                        str += '<h6 class="card-subtitle mb-2 text-muted" >'+reply.memberName+'</h6>';
+                        str += '<h6 class="card-subtitle2 mb-2 text-muted" >'+reply.memberEmail+'</h6>';
+                        str += '<p class="card-text">'+formatTime(reply.regDate)+'</p>';
+                        str += '</div>';
+                    });
+                    replyList.html(str);
+                });
+            }
+
+            $(".addReply").click(function (){
+
+                modal.modal('show');
+
+                $("input[name='text']").val("");
+                // $("input[name='memberEmail']").val("user3@email.com").attr("readonly", false);
+                $("#memberEmail").val("").attr("readonly", false);
+                $("input[name='memberName']").val("").attr("type", "hidden");
+
+                $(".replySave").show();
+                $(".replyRemove, .replyModify").hide();
+
+            });
+
+            inputWriter.change(function (){
+                console.log("input changed");
+                var inputValue = inputWriter.val();
+                console.log("input values: " + inputValue);
+            })
+
+            $(".replySave").on("click", function (){
+
+                console.log("clicked save BTN");
+
+                var emailTemp = "user99@email.com";
+
+                var reply = {
+                    bno: bno,
+                    text: inputText.val(),
+                    memberEmail: $("#memberEmail").val()
+                }
+
+                console.log(reply);
+
+                $.ajax({
+                    url: '/replies/',
+                    type: 'POST',
+                    data: JSON.stringify(reply),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function (result){
+                        var replyNo = parseInt(result);
+                        alert(result + "번 댓글이 저장됐습니다.");
+                        modal.modal('hide');
+                        loadJSONDate();
+                        // self.location.reload();
+                    }
+                });
+            });
+
+            $(".replyList").on("click", ".card-body", function (){
+
+                console.log("clicking okay");
+
+                var rno = $(this).data("rno");
+                var email = $(this).data("email");
+
+                console.log("rno: " + rno);
+                console.log("email: " + email);
+
+                $("input[name='rno']").val(rno);
+                $("input[name='memberEmail']").val(email).attr("readonly", "readonly");
+                $("input[name='text']").val($(this).find(".card-title").html());
+                $("input[name='memberName']").val($(this).find(".card-subtitle").html()).attr("type", "text").attr("readonly", "readonly");
+
+                $(".replySave").hide();
+                $(".replyModify, .replyRemove").show();
+
+                modal.modal('show');
+            });
+
+            $(".replyRemove").on("click", function (){
+
+                var rno = $("input[name='rno']").val();
+
+                console.log(rno);
+
+                $.ajax({
+                    url: '/replies/' + rno,
+                    type: 'DELETE',
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'text',
+                    success: function (result){
+                        console.log("remove_result: " + result);
+                        if(result == "success"){
+                            alert("댓글이 성공적으로 삭제 됐습니다.");
+                            modal.modal('hide');
+                            loadJSONDate();
+                        }
+                    }
+                });
+            });
+
+            $(".replyModify").on("click", function (){
+
+                var rno = $("input[name='rno']").val();
+                var email = $("input[name='memberEmail']").val();
+
+                var reply = { bno: bno, rno: rno, text: inputText.val(), memberEmail: email}
+
+                $.ajax({
+                    url: '/replies/' + rno,
+                    type: 'PUT',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(reply),
+                    success: function (result){
+                        console.log("update_result: " + result);
+                        if(result == "success"){
+                            alert("댓글이 성공적으로 수정됐습니다.");
+                            modal.modal('hide');
+                            loadJSONDate();
+                        }
+                    }
+                })
+            });
 
 
+            // $(".replyCount").click(function (){
+            //     loadJSONDate();
+            // });
+
+            loadJSONDate();
         });
 
     </script>

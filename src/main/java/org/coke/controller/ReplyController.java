@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @Log4j2
-@RequestMapping("/replies")
+@RequestMapping("/replies/")
 @RequiredArgsConstructor
 public class ReplyController {
 
@@ -24,9 +24,11 @@ public class ReplyController {
 
         log.info("replyDTO: " + replyDTO);
 
-        replyService.register(replyDTO);
+        Long rno = replyService.register(replyDTO);
 
-        return new ResponseEntity<>(replyDTO.getRno(), HttpStatus.OK);
+        log.info("rno: " + rno);
+
+        return new ResponseEntity<>(rno, HttpStatus.OK);
     }
 
     @GetMapping(value = "/board/{bno}", produces = MediaType.APPLICATION_JSON_VALUE)
