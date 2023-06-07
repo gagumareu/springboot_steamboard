@@ -1,38 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
-<th:block th:replace="~{/layout/basic :: setcontent(~{this :: content})}">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
 <body>
+<th:block th:replace="~{/layout/basic :: setcontent(~{this :: content})}">
 
-<th:block th:fragment="content">
-    <h1>Register Board Page</h1>
+    <th:block th:fragment="content">
+        <h1>Register Board Page</h1>
 
-    <form th:action="@{/board/register}" method="post">
+        <form th:action="@{/board/register}" method="post">
 
-        <div class="form-group">
-            <label>TITLE</label>
-            <input type="text" name="title" placeholder="WRITE YOUR NAME DOWN" class="form-control">
+            <div class="form-group">
+                <label>TITLE</label>
+                <input type="text" name="title" placeholder="WRITE YOUR NAME DOWN" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label>CONTENT</label>
+                <textarea class="form-control" rows="5" name="content"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>WRITER</label>
+                <input name="memberEmail" type="text" class="form-control" placeholder="WRITE DOWN YOUR EMAIL">
+            </div>
+
+            <div class="form-group fileForm">
+                <label>ATTACH FILES</label>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input files" id="fileInput" multiple>
+                    <label class="custom-file-label" data-browse="Browse"></label>
+                </div>
+            </div>
+
+            <div class="box">
+
+            </div>
+
+            <button class="btn btn-primary" type="submit">REGISTER</button>
+
+        </form>
+
+        <div class="uploadResult">
+            <ul>
+
+            </ul>
         </div>
 
-        <div class="form-group">
-            <label>CONTENT</label>
-            <textarea class="form-control" rows="5" name="content"></textarea>
-        </div>
+        <style>
 
-        <div class="form-group">
-            <label>WRITER</label>
-            <input name="memberEmail" type="text" class="form-control" placeholder="WRITE DOWN YOUR EMAIL">
-        </div>
+            .uploadResult{
+                margin-top: 30px;
+            }
 
-        <button class="btn btn-outline-primary" type="submit">REGISTER</button>
+            .uploadResult ul{
+                display: flex;
+                flex-direction: row;
+                list-style: none;
+                flex-wrap: wrap;
+                justify-content: center;
+                row-gap: 20px;
 
-    </form>
+            }
 
+            .uploadResult ul li div{
+                display: flex;
+                flex-direction: row;
+                align-items: end;
+                margin-left: 20px;
+            }
+
+            .btn-warning{
+                width: 38px;
+                margin-left: 5px;
+            }
+
+        </style>
+
+        <script th:javascript>
+
+            $(document).ready(function (e){
+
+                var regex = new RegExp("(.*?)\.(exe|sh|zip|alz|tiff)$");
+                var maxSize = 10485760;
+
+                function checkExtension(fileName, fileSize){
+
+                    if(fileSize >= maxSize){
+                        alert("파일 사이즈 초과");
+                        return false;
+                    }
+
+                    if(regex.test(fileName)){
+                        alert("해당 종류의 파일은 업로드할 수 없습니다.");
+                        return false;
+                    }
+                    return true;
+                } // checkExtension
+
+                $("#fileInput").on("change", function (){
+
+                    var originName = $(this).val();
+                    var fileName = $(this).val().split("\\").pop();
+
+                    console.log("original fileName: " + originName)
+                    console.log("fileName: " + fileName)
+
+                    var formData = new FormData();
+                    var inputFile = $(this);
+
+                    var files = inputFile[0].files;
+                    console.log("files: " + files);
+
+                    var appended = false;
+
+                    for(var i = 0; i < files.length; i++){
+
+                        if(!checkExtension(files[i].name, files[i].size)){
+                            return false;
+                        }
+                        console.log(files[i]);
+
+                        formData.append("uploadFiles", files[i]);
+                        appended = true;
+                        console.log("appended: " + appended);
+                    }
+
+                    if(!appended){
+                        return ;
+                    }
+
+                    for (var value of formData.values()){
+                        console.log(value);
+                    }
+
+                    $.ajax({
+                        url: '/uploadAjax',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        type: 'POST',
+                        dataType: 'json',
+                        success: function (result){
+                            console.log(result);
+                            showResult(result);
+                        },
+                        error: function (jqXHR, textStatus, errorThrown){
+                            console.log(textStatus);
+                        }
+                    });
+                }); // end changed input event
+
+                function showResult(uploadResultArr){
+
+                    var uploadUL = $(".uploadResult ul");
+
+                    var str = "";
+
+                    $(uploadResultArr).each(function (i, dto){
+
+                        str += "<li data-name='"+dto.fileName+"' data-path='"+dto.folderPath+"' data-uuid='"+dto.uuid+"'>";
+                        str += "<div>";
+                        str += "<img src='/display?fileName="+dto.thumbnailURL+"'>";
+                        str += "<button class='btn-warning btn-sm' type='button' data-file=\'"+dto.imageURL+"\'>X</button>";
+                        str += "</div>";
+                        str += "</li>";
+                    });
+                    uploadUL.append(str);
+                }  // showResult
+
+                $(".uploadResult").on("click", "li button",function (){
+
+                    var targetFile = $(this).data("file");
+                    var targetLi = $(this).closest("li");
+
+                    $.ajax({
+                        url: '/removeFile',
+                        data: {fileName: targetFile},
+                        dataType: 'text',
+                        type: 'POST',
+                        success: function (result){
+                            alert(result);
+                            targetLi.remove();
+                        }
+                    });
+                }); // remove
+
+                $(".btn-primary").on("click", function (e){
+
+                    console.log("clicking");
+
+                    e.preventDefault();
+
+                    var str = "";
+
+                    $(".uploadResult li").each(function (i, dto){
+                        var target = $(dto);
+
+                        str += "<input type='hidden' name='imageDTOList["+i+"].fileName' value='"+target.data("name")+"'>";
+                        str += "<input type='hidden' name='imageDTOList["+i+"].uuid' value='"+target.data("uuid")+"'>";
+                        str += "<input type='hidden' name='imageDTOList["+i+"].folderPath' value='"+target.data("path")+"'>";
+                    });
+
+                    $(".box").html(str);
+                    $("form").submit();
+
+                }); // submit
+
+
+            });
+
+        </script>
+
+    </th:block>
 </th:block>
 
 </body>
-</th:block>
+
 </html>

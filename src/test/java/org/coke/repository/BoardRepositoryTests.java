@@ -111,4 +111,26 @@ public class BoardRepositoryTests {
         });
     }
 
+    @Test
+    public void getListWithMemberImageAndReplyCount(){
+
+        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "bno"));
+
+        Page<Object[]> result = boardRepository.getListWithMemberImageAndReplyCount(pageRequest);
+
+        result.forEach( dto -> {
+            System.out.println(Arrays.toString(dto));
+        });
+    }
+
+    @Test
+    public void getBoardWithAll(){
+
+        List<Object[]> result = boardRepository.getBoardByBnoWithImageMemberAndReplyCount(401L);
+
+        result.forEach(dto -> {
+            System.out.println(Arrays.toString(dto));
+        });
+    }
+
 }

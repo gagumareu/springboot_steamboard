@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<input type="file" name="uploadFiles" multiple>
+<button type="button" class="btn">upload</button>
+
+<div class="uploadResult">
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<script>
+
+    $(".btn").click(function (){
+
+        var formData = new FormData();
+
+        var inputFiles = $("input[type='file']");
+
+        console.log(inputFiles);
+
+        var files = inputFiles[0].files;
+
+        console.log(files);
+
+        for (var i = 0; i < files.length; i++){
+            console.log(files[i]);
+            formData.append("uploadFiles", files[i]);
+        }
+
+        console.log(formData);
+
+        $.ajax({
+            url: '/uploadAjax',
+            contentType: false,
+            processData: false,
+            data: formData,
+            type: 'POST',
+            dataType: 'json',
+            success: function (result){
+                console.log(result);
+                showUploadedImages(result);
+            },
+            error: function (jqXHR, textStatus, errorThrown){
+                console.log(textStatus);
+            }
+        }); // ajax
+    });
+
+    function showUploadedImages(arr){
+
+        console.log(arr);
+
+        var divArea = $(".uploadResult");
+
+        var str = "";
+
+        for (var i = 0; i < arr.length; i++){
+            str += "<div>";
+            str += "<img src='/display?fileName="+arr[i].thumbnailURL+"'>";
+            str += "<button class='removeBtn' data-name='"+arr[i].imageURL+"'>REMOVE</button>"
+            str += "</div>";
+        }
+        divArea.append(str);
+    }
+
+    $(".uploadResult").on("click", ".removeBtn", function (){
+
+        var target = $(this);
+        var fileName = $(this).data("name");
+        var targetDiv = $(this).closest("div");
+
+        console.log("fileName: " + fileName);
+
+        $.post('/removeFile', {fileName: fileName}, function (result){
+           console.log(result);
+           if(result === true){
+               targetDiv.remove();
+           }
+        });
+    });
+
+
+</script>
+
+</body>
+</html>

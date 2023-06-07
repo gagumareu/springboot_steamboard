@@ -19,11 +19,11 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             countQuery = "SELECT COUNT (b) FROM Board b")
     Page<Object[]> getListWithReplyCount(Pageable pageable);
 
-
     @Query("SELECT b, m, COUNT (r) " +
             "FROM Board b " +
             "LEFT OUTER JOIN b.member m " +
-            "LEFT JOIN Reply r ON r.board = b WHERE b.bno = :bno")
+            "LEFT JOIN Reply r ON r.board = b " +
+            "WHERE b.bno = :bno")
     Object getBoardByBno(Long bno);
 
     @Query("SELECT b, m " +
@@ -37,5 +37,22 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             "LEFT OUTER JOIN Reply r ON r.board = b " +
             "WHERE b.bno = :bno")
     List<Object[]> getBoardWithReplyCount(@Param("bno") Long bno);
+
+    @Query( value = "SELECT b, bi, m, COUNT (distinct  r) " +
+            "FROM Board b " +
+            "LEFT OUTER JOIN BoardImage bi ON bi.board = b " +
+            "LEFT OUTER JOIN b.member m " +
+            "LEFT OUTER JOIN Reply r ON r.board = b " +
+            "GROUP BY b",
+            countQuery = "SELECT COUNT (b) FROM Board b")
+    Page<Object[]> getListWithMemberImageAndReplyCount(Pageable pageable);
+
+    @Query("SELECT b, bi, m, COUNT (distinct r) " +
+            "FROM Board b " +
+            "LEFT OUTER JOIN BoardImage bi ON bi.board = b " +
+            "LEFT OUTER JOIN b.member m " +
+            "LEFT OUTER JOIN Reply r ON r.board = b " +
+            "WHERE b.bno = :bno GROUP BY bi")
+    List<Object[]> getBoardByBnoWithImageMemberAndReplyCount(Long bno);
 
 }

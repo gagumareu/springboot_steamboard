@@ -8,8 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString
-public class BoardImage {
+@ToString(exclude = "board")
+public class BoardImage{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,7 +1,9 @@
 package org.coke.repository;
 
+import org.coke.dto.ReplyDTO;
 import org.coke.entity.Board;
 import org.coke.entity.Reply;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -16,5 +18,7 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
     List<Reply> getRepliesByBoardOrderByRno(Board board);
 
+    @EntityGraph(attributePaths = {"member"}, type = EntityGraph.EntityGraphType.FETCH)
+    List<Reply> getRepliesByBoard(Board board);
 
 }

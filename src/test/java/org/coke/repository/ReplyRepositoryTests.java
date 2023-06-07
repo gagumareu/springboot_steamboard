@@ -1,5 +1,6 @@
 package org.coke.repository;
 
+import jakarta.transaction.Transactional;
 import org.coke.entity.Board;
 import org.coke.entity.Member;
 import org.coke.entity.Reply;
@@ -38,10 +39,27 @@ public class ReplyRepositoryTests {
     @Test
     public void getList(){
 
-        List<Reply> result = replyRepository.getRepliesByBoardOrderByRno(Board.builder().bno(311L).build());
+        List<Reply> result = replyRepository.getRepliesByBoardOrderByRno(Board.builder().bno(415L).build());
 
         result.forEach(i -> {
             System.out.println(i);
         });
+    }
+
+    @Test
+    public void getList2(){
+
+        Board board = Board.builder().bno(415L).build();
+
+        List<Reply> result = replyRepository.getRepliesByBoard(board);
+
+        result.forEach( dto -> {
+            System.out.println("rno: " + dto.getRno());
+            System.out.println("text: " + dto.getText());
+            System.out.println("email: " + dto.getMember().getEmail());
+            System.out.println("name: " + dto.getMember().getName());
+            System.out.println("-----------------------------------");
+        });
+
     }
 }

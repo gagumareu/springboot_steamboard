@@ -7,6 +7,7 @@ import org.coke.dto.BoardDTO;
 import org.coke.dto.PageRequestDTO;
 import org.coke.dto.PageResultDTO;
 import org.coke.entity.Board;
+import org.coke.entity.BoardImage;
 import org.coke.entity.Member;
 import org.coke.repository.BoardImageRepository;
 import org.coke.repository.BoardRepository;
@@ -15,7 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
@@ -29,14 +30,23 @@ public class BoardServiceImpl implements BoardService{
 
     private final BoardImageRepository boardImageRepository;
 
+    @Transactional
     @Override
     public Long register(BoardDTO boardDTO) {
 
-        Board board = dtoToEntity(boardDTO);
+        Map<String, Object> entityMap = dtoToEntity(boardDTO);
+        Board board = (Board) entityMap.get("board");
+        List<BoardImage> boardImageList = (List<BoardImage>) entityMap.get("imageList");
 
         log.info(board);
 
         boardRepository.save(board);
+
+        if(boardImageList != null && boardImageList.size() > 0){
+            boardImageList.forEach(boardImage -> {
+                boardImageRepository.save(boardImage);
+            });
+        }
 
         return board.getBno();
     }
@@ -44,10 +54,15 @@ public class BoardServiceImpl implements BoardService{
     @Override
     public PageResultDTO<BoardDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
 
-        Function<Object[], BoardDTO> fn = (en -> entityToDTO((Board) en[0], (Member) en[1], (Long) en[2]));
-
         Page<Object[]> result =
-                boardRepository.getListWithReplyCount(pageRequestDTO.getPageable(Sort.by("bno").descending()));
+                boardRepository.getListWithMemberImageAndReplyCount(pageRequestDTO.getPageable(Sort.by("bno").descending()));
+
+        Function<Object[], BoardDTO> fn = (arr -> entityToDTO(
+                (Board) arr[0],
+                (List<BoardImage>) (Arrays.asList((BoardImage)arr[1])),
+                (Member) arr[2],
+                (Long) arr[3])
+        );
 
         return new PageResultDTO<>(result, fn);
     }
@@ -55,11 +70,22 @@ public class BoardServiceImpl implements BoardService{
     @Override
     public BoardDTO getBoard(Long bno) {
 
-        Object result =  boardRepository.getBoardByBno(bno);
+        List<Object[]> result =  boardRepository.getBoardByBnoWithImageMemberAndReplyCount(bno);
 
-        Object[] arr = (Object[]) result;
+        Board board = (Board) result.get(0)[0];
 
-        return entityToDTO((Board) arr[0], (Member) arr[1], (Long) arr[2]);
+        List<BoardImage> boardImageList = new ArrayList<>();
+
+        result.forEach(arr ->{
+            BoardImage boardImage = (BoardImage) arr[1];
+            boardImageList.add(boardImage);
+        });
+
+        Member member = (Member) result.get(0)[2];
+
+        Long replyCount = (Long) result.get(0)[3];
+
+        return entityToDTO(board, boardImageList, member, replyCount);
     }
 
     @Transactional
