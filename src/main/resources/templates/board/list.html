@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+
+
 </head>
 <body>
 
@@ -32,9 +34,9 @@
             <th scope="row">[[${dto.bno}]]</th>
             <td>
                 <a th:href="@{/board/read(bno=${dto.bno}, page=${boardList.page})}">
-<!--                    <img th:if="${dto.imageDTOList != null}"-->
-<!--                         th:src="|/display?fileName=${dto.imageDTOList[0].getThumbnailURL()}|">-->
-                    <span th:if="${dto.imageDTOList == null}"><small>[[${dto.title}]]</small></span>
+                    <img id="img" th:if="${dto.imageDTOList[0]?.uuid != null && dto.imageDTOList[0]?.folderPath != null
+                    && dto.imageDTOList[0]?.fileName != null }"
+                         th:src="|/display?fileName=${dto.imageDTOList[0].getThumbnailURL()}|">
                     [[${dto.title}]] [<b th:text="${dto.replyCount}"></b>]
                 </a>
             </td>
@@ -63,6 +65,17 @@
             </a>
         </li>
     </ul>
+
+    <style>
+        #img{
+            width: 15%;
+            /*height: 100px;*/
+        }
+
+        a{
+            color: black;
+        }
+    </style>
 
 
 

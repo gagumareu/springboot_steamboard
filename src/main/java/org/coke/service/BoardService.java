@@ -61,17 +61,6 @@ public interface BoardService {
     }
 
     default BoardDTO entityToDTO(Board board, List<BoardImage> boardImageList, Member member, Long replyCount){
-        System.out.println("---------------------board service------------");
-        System.out.println("board on service: " + board);
-        System.out.println("boardImageList on service: " + boardImageList);
-        boardImageList.forEach( i ->{
-            System.out.println("uuid : " + i.getUuid());
-            System.out.println("path : " + i.getPath());
-            System.out.println("fileName : " + i.getFileName());
-
-        });
-        System.out.println("member on service: " + member);
-        System.out.println("replyCount on service: " + replyCount);
 
         BoardDTO boardDTO = BoardDTO.builder()
                 .bno(board.getBno())
@@ -98,15 +87,6 @@ public interface BoardService {
             }).collect(Collectors.toList());
             boardDTO.setImageDTOList(boardImageDTOList);
         }
-        System.out.println("*************************************************************");
-        System.out.println("boardDTO on service: " + boardDTO);
-        System.out.println("boardDTO_ImageList on service: " + boardDTO.getImageDTOList());
-        System.out.println("boardDTO_ImageList size on service: " + boardDTO.getImageDTOList().size());
-        boardDTO.getImageDTOList().forEach(i ->{
-            System.out.println("uuid : " + i.getUuid());
-            System.out.println("fileName : " + i.getFileName());
-            System.out.println("Patn : " + i.getFolderPath());
-        });
 
         return boardDTO;
     }

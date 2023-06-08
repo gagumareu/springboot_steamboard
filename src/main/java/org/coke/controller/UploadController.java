@@ -101,7 +101,7 @@ public class UploadController {
 
 
     @GetMapping("/display")
-    public ResponseEntity<byte[]> getFile(String fileName){
+    public ResponseEntity<byte[]> getFile(String fileName, String size){
 
         log.info("----------------- disply on controller ----------------");
 
@@ -112,12 +112,17 @@ public class UploadController {
         try {
 
             String srcFileName = URLDecoder.decode(fileName, "UTF-8");
-
             log.info("srcFileName: " + srcFileName);
 
             File file = new File(uploadPath + File.separator + srcFileName);
 
-            log.info("file: " + file);
+
+            if (size != null && size.equals("1")){
+                file = new File(file.getParent(), file.getName().substring(2));
+                log.info("not thumbnail_file: " + file);
+            }
+
+            log.info("thumbnail_file: " + file);
 
             HttpHeaders header = new HttpHeaders();
 
