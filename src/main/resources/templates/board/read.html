@@ -46,6 +46,14 @@
         <input class="form-control" type="text" name="bno" th:value="${#temporals.format(dto.modDate, 'yyyy/MM/dd')}" readonly>
     </div>
 
+    <div class="form-group uploadResult">
+        <ul>
+           <li th:each="images : ${dto.imageDTOList}">
+               <img th:if="${images != null}" th:src="|/display?fileName=${images.getThumbnailURL()}|">
+           </li>
+        </ul>
+    </div>
+
     <a th:href="@{/board/update(bno=${dto.bno}, page=${pageRequestDTO.page} )}">
         <button type="button" class="btn btn-primary">MODIFY</button>
     </a>
@@ -100,6 +108,31 @@
 
         </div>
     </div>
+
+
+    <style>
+
+        .uploadResult{
+            margin-top: 30px;
+        }
+
+        .uploadResult ul{
+            display: flex;
+            flex-direction: row;
+            list-style: none;
+            flex-wrap: wrap;
+            justify-content: center;
+            row-gap: 20px;
+
+        }
+
+        .uploadResult ul li{
+
+            margin-left: 20px;
+        }
+
+
+    </style>
 
     <script th:javascript>
 

@@ -126,7 +126,7 @@ public class BoardRepositoryTests {
     @Test
     public void getBoardWithAll(){
 
-        List<Object[]> result = boardRepository.getBoardByBnoWithImageMemberAndReplyCount(401L);
+        List<Object[]> result = boardRepository.getBoardByBnoWithImageMemberAndReplyCount(418L);
 
         result.forEach(dto -> {
             System.out.println(Arrays.toString(dto));

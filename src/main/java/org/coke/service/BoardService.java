@@ -64,6 +64,12 @@ public interface BoardService {
         System.out.println("---------------------board service------------");
         System.out.println("board on service: " + board);
         System.out.println("boardImageList on service: " + boardImageList);
+        boardImageList.forEach( i ->{
+            System.out.println("uuid : " + i.getUuid());
+            System.out.println("path : " + i.getPath());
+            System.out.println("fileName : " + i.getFileName());
+
+        });
         System.out.println("member on service: " + member);
         System.out.println("replyCount on service: " + replyCount);
 
@@ -75,6 +81,7 @@ public interface BoardService {
                 .memberName(member.getName())
                 .regDate(board.getRegDate())
                 .modDate(board.getModDate())
+                .replyCount(replyCount.intValue())
                 .build();
 
         if (boardImageList != null && boardImageList.size() > 0) {
@@ -91,8 +98,15 @@ public interface BoardService {
             }).collect(Collectors.toList());
             boardDTO.setImageDTOList(boardImageDTOList);
         }
-
-        boardDTO.setReplyCount(replyCount.intValue());
+        System.out.println("*************************************************************");
+        System.out.println("boardDTO on service: " + boardDTO);
+        System.out.println("boardDTO_ImageList on service: " + boardDTO.getImageDTOList());
+        System.out.println("boardDTO_ImageList size on service: " + boardDTO.getImageDTOList().size());
+        boardDTO.getImageDTOList().forEach(i ->{
+            System.out.println("uuid : " + i.getUuid());
+            System.out.println("fileName : " + i.getFileName());
+            System.out.println("Patn : " + i.getFolderPath());
+        });
 
         return boardDTO;
     }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.coke.dto.BoardDTO;
 import org.coke.dto.PageRequestDTO;
+import org.coke.dto.PageResultDTO;
 import org.coke.service.BoardService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -57,6 +58,10 @@ public class BoardController {
         BoardDTO boardDTO = boardService.getBoard(bno);
 
         log.info("boardDTO: " + boardDTO);
+
+        System.out.println("list : " + boardDTO.getImageDTOList());
+        System.out.println("list size: " + boardDTO.getImageDTOList().size());
+        System.out.println("list folderPath: " + boardDTO.getImageDTOList().get(0));
 
         model.addAttribute("dto", boardDTO);
     }

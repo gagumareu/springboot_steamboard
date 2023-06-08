@@ -61,8 +61,9 @@ public class BoardServiceImpl implements BoardService{
                 (Board) arr[0],
                 (List<BoardImage>) (Arrays.asList((BoardImage)arr[1])),
                 (Member) arr[2],
-                (Long) arr[3])
-        );
+                (Long) arr[3]
+        ));
+
 
         return new PageResultDTO<>(result, fn);
     }
