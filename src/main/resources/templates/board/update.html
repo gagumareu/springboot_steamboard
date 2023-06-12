@@ -52,11 +52,56 @@
             <input class="form-control" type="text" name="bno" th:value="${#temporals.format(dto.modDate, 'yyyy/MM/dd')}" readonly>
         </div>
 
+        <div class="form-group fileForm">
+            <label>ATTACH FILES</label>
+            <div class="custom-file">
+                <input type="file" class="custom-file-input files" id="fileInput" multiple>
+                <label class="custom-file-label" data-browse="Browse"></label>
+            </div>
+        </div>
+
+        <div class="form-group uploadResult" >
+            <ul>
+                <li th:each="images : ${dto.imageDTOList}"
+                    th:data-path="${images.folderPath}" th:data-uuid="${images.uuid}" th:data-name="${images.fileName}">
+                    <img th:if="${images != null}" th:src="|/display?fileName=${images?.getThumbnailURL()}|">
+                    <button class='btn-warning btn-sm' type='button' th:data-file="${images.getImageURL()}">X</button>
+                </li>
+            </ul>
+        </div>
+
         <button type="submit" class="btn btn-primary">MODIFY</button>
         <button type="button" class="btn btn-danger removeBtn">REMOVE</button>
         <button type="button" class="btn btn-secondary listBtn">LIST</button>
 
     </form>
+
+    <style>
+
+        form{
+            margin-bottom: 100px;
+        }
+        .uploadResult{
+            margin-top: 30px;
+
+        }
+
+        .uploadResult ul{
+            display: flex;
+            flex-direction: row;
+            list-style: none;
+            flex-wrap: wrap;
+            justify-content: center;
+            row-gap: 20px;
+
+        }
+
+        .uploadResult ul li{
+
+            margin-left: 20px;
+        }
+
+    </style>
 
     <script th:javascript>
 
@@ -68,7 +113,7 @@
 
                 $("form").attr("action", "/board/remove").submit();
 
-            });
+            });  // remove
 
             $(".listBtn").on("click", function (){
 
@@ -83,7 +128,100 @@
 
                 $("form").attr("action", "/board/list");
                 $("form").attr("method", "get").submit();
-            });
+            });  // list
+
+            var regex = new RegExp("(.*?)\.(exe|sh|zip|tiff)$");
+            var maxSize = 10485760;
+
+            function checkExtension(fileName, size){
+
+                if(size >= maxSize){
+                    alert("파일 크기가 너무 큽니다.");
+                    return false;
+                }
+
+                if (regex.test(fileName)){
+                    alert("해당 종류의 파일은 업로드할 수 없습니다.");
+                    return false;
+                }
+                return true;
+            }
+
+            $(".custom-file-input").change(function (){
+
+                var formData = new FormData();
+                var inputFiles = $(this);
+                var files = inputFiles[0].files;
+
+                console.log(files);
+
+                for (var i = 0; i < files.length; i++){
+
+                    if (!checkExtension(files[i].name, files[i].size)){
+                        return false;
+                    }
+                    console.log(files[i]);
+                    formData.append("uploadFiles", files[i]);
+                }
+
+                $.ajax({
+                    url: '/uploadAjax',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function (result){
+                        console.log(result);
+                        showUploadResult(result);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown){
+                        console.log(textStatus);
+                    }
+                });
+
+                function showUploadResult(arr){
+
+                    if(arr.length == 0 || !arr){
+                        return;
+                    }
+
+                    var uploadResultUL = $(".uploadResult ul");
+                    var str = "";
+
+                    $(arr).each(function (i, obj){
+                        var target = obj;
+
+                        str += "<li data-name='"+target.folderPath+"' data-uuid='"+target.uuid+"' data-name='"+target.fileName+"'>";
+                        str += "<img src='/display?fileName="+target.thumbnailURL+"'>";
+                        str += "<button type='button' class='btn-warning btn-sm' data-file='"+target.imageURL+"'>X</button>";
+                        str += "</li>";
+
+                    });
+                    uploadResultUL.append(str);
+                }
+            }); // input change event
+
+            $(".uploadResult ul").on("click", "li button ", function (e){
+
+                var targetURL = $(this).data("file");
+                console.log("file url: " + targetURL);
+                var targetLi = $(this).closest("li");
+
+                $.ajax({
+                    url: '/removeFile',
+                    data: {fileName: targetURL},
+                    dataType: 'text',
+                    type: 'POST',
+                    success: function (result){
+                        alert(result);
+                        targetLi.remove();
+                    }
+                })
+            }); // remove
+
+
+
 
         });
 

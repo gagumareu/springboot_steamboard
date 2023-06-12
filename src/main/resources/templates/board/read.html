@@ -48,7 +48,7 @@
 
     <div class="form-group uploadResult">
         <ul>
-           <li th:each="images : ${dto.imageDTOList}" th:data-file="${images.getThumbnailURL()}">
+           <li th:each="images : ${dto.imageDTOList}" th:data-file="${images?.getThumbnailURL()}">
                <img th:if="${images != null}" th:src="|/display?fileName=${images.getThumbnailURL()}|">
            </li>
         </ul>
