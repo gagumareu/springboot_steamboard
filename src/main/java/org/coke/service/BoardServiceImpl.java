@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.coke.dto.BoardDTO;
+import org.coke.dto.BoardImageDTO;
 import org.coke.dto.PageRequestDTO;
 import org.coke.dto.PageResultDTO;
 import org.coke.entity.Board;
@@ -100,8 +101,11 @@ public class BoardServiceImpl implements BoardService{
         boardRepository.deleteById(bno);
     }
 
+    @Transactional
     @Override
     public void modify(BoardDTO boardDTO) {
+
+        boardImageRepository.deleteByBno(boardDTO.getBno());
 
         Optional<Board> result = boardRepository.findById(boardDTO.getBno());
 
@@ -112,7 +116,17 @@ public class BoardServiceImpl implements BoardService{
 
         boardRepository.save(board);
 
+        List<BoardImage> boardImageList = boardImageDtoToEntity(boardDTO);
+
+        if(boardImageList.size() > 0 && boardImageList != null){
+            boardImageList.forEach(boardImage -> {
+                boardImageRepository.save(boardImage);
+            });
+        }
     }
+
+
+
 
 
 }

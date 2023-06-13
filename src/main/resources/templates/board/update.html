@@ -62,15 +62,19 @@
 
         <div class="form-group uploadResult" >
             <ul>
-                <li th:each="images : ${dto.imageDTOList}"
+                <li th:each="images : ${dto.imageDTOList}" th:if="${images != null}"
                     th:data-path="${images.folderPath}" th:data-uuid="${images.uuid}" th:data-name="${images.fileName}">
                     <img th:if="${images != null}" th:src="|/display?fileName=${images?.getThumbnailURL()}|">
-                    <button class='btn-warning btn-sm' type='button' th:data-file="${images.getImageURL()}">X</button>
+                    <button data-tell="oldLi" class='btn-warning btn-sm' type='button' th:data-file="${images?.getImageURL()}">X</button>
                 </li>
             </ul>
         </div>
 
-        <button type="submit" class="btn btn-primary">MODIFY</button>
+        <div class="hiddenBox">
+
+        </div>
+
+        <button type="submit" class="btn btn-primary modifyBtn">MODIFY</button>
         <button type="button" class="btn btn-danger removeBtn">REMOVE</button>
         <button type="button" class="btn btn-secondary listBtn">LIST</button>
 
@@ -192,9 +196,9 @@
                     $(arr).each(function (i, obj){
                         var target = obj;
 
-                        str += "<li data-name='"+target.folderPath+"' data-uuid='"+target.uuid+"' data-name='"+target.fileName+"'>";
+                        str += "<li data-path='"+target.folderPath+"' data-uuid='"+target.uuid+"' data-name='"+target.fileName+"'>";
                         str += "<img src='/display?fileName="+target.thumbnailURL+"'>";
-                        str += "<button type='button' class='btn-warning btn-sm' data-file='"+target.imageURL+"'>X</button>";
+                        str += "<button data-tell='newLi' type='button' class='btn-warning btn-sm' data-file='"+target.imageURL+"'>X</button>";
                         str += "</li>";
 
                     });
@@ -202,24 +206,59 @@
                 }
             }); // input change event
 
-            $(".uploadResult ul").on("click", "li button ", function (e){
+            $(".uploadResult").on("click", "li button", function (e){
+
+                console.log("clicking new one");
 
                 var targetURL = $(this).data("file");
                 console.log("file url: " + targetURL);
                 var targetLi = $(this).closest("li");
+                var findwitch = $(this).data("tell");
+                console.log("with One : " + findwitch);
 
-                $.ajax({
-                    url: '/removeFile',
-                    data: {fileName: targetURL},
-                    dataType: 'text',
-                    type: 'POST',
-                    success: function (result){
-                        alert(result);
-                        targetLi.remove();
-                    }
-                })
+                if(findwitch == "newLi"){
+                    console.log("a old file");
+
+                    $.ajax({
+                        url: '/removeFile',
+                        data: {fileName: targetURL},
+                        dataType: 'text',
+                        type: 'POST',
+                        success: function (result){
+                            alert(result);
+                            targetLi.remove();
+                        }
+                    })
+                }if (findwitch == "oldLi"){
+
+                    console.log("a new file");
+
+                    var targetLi = $(this).closest("li");
+
+                    targetLi.remove();
+                }
+
             }); // remove
 
+            $(".modifyBtn").on("click", function (e){
+
+                e.preventDefault();
+
+                console.log("clicking...");
+
+                var str = "";
+
+                $(".uploadResult li").each(function (i, obj){
+
+                    var target = $(obj);
+
+                    str += "<input type='hidden' name='imageDTOList["+i+"].folderPath' value='"+target.data("path")+"'>";
+                    str += "<input type='hidden' name='imageDTOList["+i+"].uuid' value='"+target.data("uuid")+"'>";
+                    str += "<input type='hidden' name='imageDTOList["+i+"].fileName' value='"+target.data("name")+"'>";
+                });
+                $(".hiddenBox").html(str);
+                $("form").submit();
+            });
 
 
 

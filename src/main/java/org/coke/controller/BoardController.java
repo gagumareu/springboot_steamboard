@@ -89,7 +89,6 @@ public class BoardController {
         boardService.modify(boardDTO);
 
         redirectAttributes.addAttribute("bno", boardDTO.getBno());
-
         redirectAttributes.addAttribute("page", pageRequestDTO.getPage());
 //        redirectAttributes.addAttribute("page", pageRequestDTO.getType());
 //        redirectAttributes.addAttribute("keyword", pageRequestDTO.getKeyword());

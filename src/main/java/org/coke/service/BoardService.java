@@ -40,20 +40,15 @@ public interface BoardService {
         List<BoardImageDTO> imageDTOList = boardDTO.getImageDTOList();
 
         if(imageDTOList != null && imageDTOList.size() > 0){
-
             List<BoardImage> boardImageList = imageDTOList.stream().map(boardImageDTO -> {
-
                 BoardImage boardImage = BoardImage.builder()
                         .path(boardImageDTO.getFolderPath())
                         .uuid(boardImageDTO.getUuid())
                         .fileName(boardImageDTO.getFileName())
                         .board(board)
                         .build();
-
                 return boardImage;
-
             }).collect(Collectors.toList());
-
             entityMap.put("imageList", boardImageList);
         }
 
@@ -89,6 +84,25 @@ public interface BoardService {
         }
 
         return boardDTO;
+    }
+
+    default List<BoardImage> boardImageDtoToEntity(BoardDTO boardDTO){
+
+        Board board = Board.builder().bno(boardDTO.getBno()).build();
+
+        List<BoardImageDTO> boardImageDTOList = boardDTO.getImageDTOList();
+
+        List<BoardImage> boardImageList = boardImageDTOList.stream().map(boardImageDTO -> {
+            BoardImage boardImage = BoardImage.builder()
+                    .path(boardImageDTO.getFolderPath())
+                    .uuid(boardImageDTO.getUuid())
+                    .fileName(boardImageDTO.getFileName())
+                    .board(board)
+                    .build();
+            return boardImage;
+        }).collect(Collectors.toList());
+
+        return boardImageList;
     }
 
 }
