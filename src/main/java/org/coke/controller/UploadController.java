@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,6 +32,20 @@ public class UploadController {
 
     @Value("${org.coke.upload.path}")
     private String uploadPath;
+
+    private String makeFolder(){
+
+        String str = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+
+        String folderPath = str.replace("/", File.separator);
+
+        File uploadPathFolder = new File(uploadPath, folderPath);
+
+        if(uploadPathFolder.exists() == false){
+            uploadPathFolder.mkdirs();
+        }
+        return folderPath;
+    }
 
     @PostMapping("/uploadAjax")
     public ResponseEntity<List<UploadResultDTO>> uploadFile(MultipartFile[] uploadFiles){
@@ -84,21 +97,6 @@ public class UploadController {
         return new ResponseEntity<>(resultDTOList, HttpStatus.OK);
     }
 
-    private String makeFolder(){
-
-        String str = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
-
-        String folderPath = str.replace("/", File.separator);
-
-        File uploadPathFolder = new File(uploadPath, folderPath);
-
-        if(uploadPathFolder.exists() == false){
-            uploadPathFolder.mkdirs();
-        }
-        return folderPath;
-    }
-
-
 
     @GetMapping("/display")
     public ResponseEntity<byte[]> getFile(String fileName, String size){
@@ -107,32 +105,25 @@ public class UploadController {
 
         ResponseEntity<byte[]> result = null;
 
-        log.info("fileName: " + fileName);
-
         try {
 
             String srcFileName = URLDecoder.decode(fileName, "UTF-8");
             log.info("srcFileName: " + srcFileName);
 
             File file = new File(uploadPath + File.separator + srcFileName);
-
+            log.info("thumbnail_file: " + file);
 
             if (size != null && size.equals("1")){
                 file = new File(file.getParent(), file.getName().substring(2));
                 log.info("not thumbnail_file: " + file);
             }
 
-            log.info("thumbnail_file: " + file);
-
             HttpHeaders header = new HttpHeaders();
 
             header.add("Content-Type", Files.probeContentType(file.toPath()));
 
-            log.info("header: " + header);
-
             result = new ResponseEntity<>(FileCopyUtils.copyToByteArray(file), header, HttpStatus.OK);
 
-            log.info("result: " + result);
 
         } catch (Exception e) {
             log.error(e.getMessage());

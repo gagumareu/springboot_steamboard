@@ -13,6 +13,7 @@ import org.coke.entity.Member;
 import org.coke.repository.BoardImageRepository;
 import org.coke.repository.BoardRepository;
 import org.coke.repository.ReplyRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -55,8 +56,10 @@ public class BoardServiceImpl implements BoardService{
     @Override
     public PageResultDTO<BoardDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
 
-        Page<Object[]> result =
-                boardRepository.getListWithMemberImageAndReplyCount(pageRequestDTO.getPageable(Sort.by("bno").descending()));
+        log.info(pageRequestDTO);
+
+//        Page<Object[]> result =
+//                boardRepository.getListWithMemberImageAndReplyCount(pageRequestDTO.getPageable(Sort.by("bno").descending()));
 
         Function<Object[], BoardDTO> fn = (arr -> entityToDTO(
                 (Board) arr[0],
@@ -65,6 +68,11 @@ public class BoardServiceImpl implements BoardService{
                 (Long) arr[3]
         ));
 
+        Page<Object[]> result = boardRepository.searchPage(
+                pageRequestDTO.getType(),
+                pageRequestDTO.getKeyword(),
+                pageRequestDTO.getPageable(Sort.by("bno").descending())
+        );
 
         return new PageResultDTO<>(result, fn);
     }

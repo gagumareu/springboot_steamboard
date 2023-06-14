@@ -54,10 +54,10 @@
         </ul>
     </div>
 
-    <a th:href="@{/board/update(bno=${dto.bno}, page=${pageRequestDTO.page} )}">
+    <a th:href="@{/board/update(bno=${dto.bno}, page=${pageRequestDTO.page}, keyword=${pageRequestDTO.keyword}, type=${pageRequestDTO.type} )}">
         <button type="button" class="btn btn-primary">MODIFY</button>
     </a>
-    <a th:href="@{/board/list(page=${pageRequestDTO.page})}">
+    <a th:href="@{/board/list(page=${pageRequestDTO.page}, type=${pageRequestDTO.type}, keyword=${pageRequestDTO.keyword}) }">
         <button type="button" class="btn btn-danger">LIST</button>
     </a>
 

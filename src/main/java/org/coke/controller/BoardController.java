@@ -1,15 +1,24 @@
 package org.coke.controller;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.coke.dto.BoardDTO;
+import org.coke.dto.BoardImageDTO;
 import org.coke.dto.PageRequestDTO;
 import org.coke.dto.PageResultDTO;
+import org.coke.entity.Board;
+import org.coke.entity.BoardImage;
+import org.coke.service.BoardImageService;
 import org.coke.service.BoardService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.io.File;
+import java.util.List;
 
 @Controller
 @Log4j2
@@ -18,6 +27,35 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class BoardController {
 
     private final BoardService boardService;
+
+    private final BoardImageService boardImageService;
+
+    @Value("${org.coke.upload.path}")
+    private String uploadPath;
+
+    private void deleteFile(List<BoardImage> boardImageDTOList){
+
+        log.info("**************** removing images on controller ******************");
+
+        log.info("boardImageDTOList : " + boardImageDTOList);
+        log.info("boardImageDTOList_size : " + boardImageDTOList.size());
+
+        boardImageDTOList.forEach(boardImage -> {
+
+            String path = boardImage.getPath();
+            String uuid = boardImage.getUuid();
+            String fileName = boardImage.getFileName();
+
+
+            File file = new File(uploadPath + File.separator + path + File.separator + uuid + "_" + fileName);
+            log.info("file: " + file);
+            file.delete();
+
+            File thumbnail = new File(file.getParent(), "s_" + file.getName());
+            log.info("thumbnail: " + thumbnail);
+            thumbnail.delete();
+        });
+    }
 
     @GetMapping("/list")
     public void getList(PageRequestDTO pageRequestDTO, Model model){
@@ -66,11 +104,21 @@ public class BoardController {
         model.addAttribute("dto", boardDTO);
     }
 
+    @Transactional
     @PostMapping("/remove")
     public String delete(Long bno, RedirectAttributes redirectAttributes){
 
         log.info("************ board delete on controller ************");
 
+        log.info("[1] delete files");
+        List<BoardImage> boardImageList = boardImageService.getBoardImageList(bno);
+        log.info("boardImageList: " + boardImageList);
+
+        if (boardImageList != null && boardImageList.size() > 0){
+            deleteFile(boardImageList);
+        }
+
+        log.info("[2] deleteDB");
         boardService.removeWithRepliesAndImages(bno);
 
         redirectAttributes.addFlashAttribute("msg", bno);
