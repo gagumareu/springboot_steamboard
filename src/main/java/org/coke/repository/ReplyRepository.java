@@ -16,6 +16,7 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
     @Query("DELETE FROM Reply r WHERE r.board.bno = :bno")
     void deleteByBno(Long bno);
 
+    @EntityGraph(attributePaths = {"member"}, type = EntityGraph.EntityGraphType.FETCH)
     List<Reply> getRepliesByBoardOrderByRno(Board board);
 
     @EntityGraph(attributePaths = {"member"}, type = EntityGraph.EntityGraphType.FETCH)

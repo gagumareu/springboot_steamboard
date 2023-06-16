@@ -41,8 +41,12 @@ public class ReplyRepositoryTests {
 
         List<Reply> result = replyRepository.getRepliesByBoardOrderByRno(Board.builder().bno(415L).build());
 
-        result.forEach(i -> {
-            System.out.println(i);
+        result.forEach(dto -> {
+            System.out.println("rno: " + dto.getRno());
+            System.out.println("text: " + dto.getText());
+            System.out.println("email: " + dto.getMember().getEmail());
+            System.out.println("name: " + dto.getMember().getName());
+            System.out.println("-----------------------------------");
         });
     }
 
