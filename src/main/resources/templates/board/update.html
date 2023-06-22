@@ -211,10 +211,11 @@
                 console.log("clicking new one");
 
                 var targetURL = $(this).data("file");
-                console.log("file url: " + targetURL);
                 var targetLi = $(this).closest("li");
                 var findwitch = $(this).data("tell");
-                console.log("with One : " + findwitch);
+
+                console.log("file url: " + targetURL);
+                console.log("witch One : " + findwitch);
 
                 if(findwitch == "newLi"){
                     console.log("a old file");

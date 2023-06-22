@@ -36,6 +36,8 @@ public class BoardServiceImpl implements BoardService{
     @Override
     public Long register(BoardDTO boardDTO) {
 
+        log.info("boardDTO_serviceImpl: " + boardDTO);
+
         Map<String, Object> entityMap = dtoToEntity(boardDTO);
         Board board = (Board) entityMap.get("board");
         List<BoardImage> boardImageList = (List<BoardImage>) entityMap.get("imageList");
@@ -56,7 +58,7 @@ public class BoardServiceImpl implements BoardService{
     @Override
     public PageResultDTO<BoardDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
 
-        log.info(pageRequestDTO);
+        log.info("pageRequestDTO_serviceImpl: " + pageRequestDTO);
 
 //        Page<Object[]> result =
 //                boardRepository.getListWithMemberImageAndReplyCount(pageRequestDTO.getPageable(Sort.by("bno").descending()));

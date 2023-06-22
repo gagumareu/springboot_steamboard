@@ -29,7 +29,7 @@ public interface BoardService {
         Member member = Member.builder().email(boardDTO.getMemberEmail()).build();
 
         Board board = Board.builder()
-                .bno(boardDTO.getBno())
+//                .bno(boardDTO.getBno())
                 .title(boardDTO.getTitle())
                 .content(boardDTO.getContent())
                 .member(member)

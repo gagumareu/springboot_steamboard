@@ -33,14 +33,14 @@ public class BoardController {
     @Value("${org.coke.upload.path}")
     private String uploadPath;
 
-    private void deleteFile(List<BoardImage> boardImageDTOList){
+    private void deleteFile(List<BoardImage> boardImageList){
 
         log.info("**************** removing images on controller ******************");
 
-        log.info("boardImageDTOList : " + boardImageDTOList);
-        log.info("boardImageDTOList_size : " + boardImageDTOList.size());
+        log.info("boardImageList : " + boardImageList);
+        log.info("boardImageList_size : " + boardImageList.size());
 
-        boardImageDTOList.forEach(boardImage -> {
+        boardImageList.forEach(boardImage -> {
 
             String path = boardImage.getPath();
             String uuid = boardImage.getUuid();
