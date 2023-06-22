@@ -2,6 +2,7 @@ package org.coke.controller;
 
 import lombok.extern.log4j.Log4j2;
 import net.coobird.thumbnailator.Thumbnailator;
+import org.coke.dto.CkEditorDTO;
 import org.coke.dto.UploadResultDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -17,14 +18,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @Log4j2
@@ -95,6 +95,60 @@ public class UploadController {
         } // for
 
         return new ResponseEntity<>(resultDTOList, HttpStatus.OK);
+    }
+
+    @PostMapping("/ckeditor")
+    public Map<String, Object> ckeditor(MultipartFile[] upload){
+
+        log.info("---------------------uploadAjax controller-----------------");
+
+        Map<String, Object> fileMap = new HashMap<>();
+
+        for (MultipartFile uploadFile : upload){
+
+//            if(!uploadFile.getContentType().startsWith("image")){
+//                log.warn("this files'type is not image");
+//                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//            }
+
+            String originalFilename = uploadFile.getOriginalFilename();
+            String fileName = originalFilename.substring(originalFilename.lastIndexOf("\\") +1);
+
+            log.info("originalFilename: " + originalFilename);
+            log.info("fileName: " + fileName);
+
+            String folderPath = makeFolder();
+
+            String uuid = UUID.randomUUID().toString();
+
+            String saveName = uploadPath + File.separator + folderPath + File.separator + uuid + "_" + fileName;
+            log.info("saveName: " + saveName);
+
+            Path savePath = Paths.get(saveName);
+            log.info("savePath: " + savePath);
+
+            String fileURL = URLEncoder.encode(folderPath + "/" + uuid + "_" + fileName);
+            log.info("savePath: " + fileURL);
+
+            try {
+
+                uploadFile.transferTo(savePath);
+
+                String thumbnailSaveName = uploadPath + File.separator + folderPath + File.separator + "s_" + uuid + "_" + fileName;
+                File thumbnailFile = new File(thumbnailSaveName);
+                Thumbnailator.createThumbnail(savePath.toFile(), thumbnailFile, 200, 200);
+
+
+                fileMap.put("uploaded", 1);
+                fileMap.put("fileName", fileName);
+                fileMap.put("url", "/display?fileName=" + fileURL);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } // for
+
+        return fileMap;
     }
 
 

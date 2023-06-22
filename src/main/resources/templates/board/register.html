@@ -19,8 +19,29 @@
 
             <div class="form-group">
                 <label>CONTENT</label>
-                <textarea class="form-control" rows="5" name="content"></textarea>
+                <textarea id="editor" rows="5" name="content"></textarea>
             </div>
+            <script>
+
+                ClassicEditor
+                    .create( document.querySelector( '#editor' ),{
+                        language: "ko",
+                        ckfinder: {
+                            uploadUrl : '/ckeditor',
+                            uploaded: true
+                            // options: {
+                            //     resourceType: 'Images'
+                            // }
+                        }
+                    } )
+                    .then(editor => {
+
+                    })
+                    .catch( error => {
+                        console.error( error );
+                    } );
+
+            </script>
 
             <div class="form-group">
                 <label>WRITER</label>

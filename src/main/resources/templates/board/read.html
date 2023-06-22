@@ -5,6 +5,12 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
+    <style>
+        img{
+            width: 100%;
+        }
+    </style>
+
 <body>
 
 <th:block th:fragment="content">
@@ -23,7 +29,7 @@
 
     <div class="form-group">
         <label>CONTENT</label>
-        <textarea name="conetent" class="form-control" rows="5" readonly>[[${dto.content}]]</textarea>
+        <p th:utext="${dto.content}"></p>
     </div>
 
     <div class="form-group">
