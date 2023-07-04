@@ -5,11 +5,6 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
-    <style>
-        img{
-            width: 100%;
-        }
-    </style>
 
 <body>
 
@@ -29,7 +24,7 @@
 
     <div class="form-group">
         <label>CONTENT</label>
-        <p th:utext="${dto.content}"></p>
+        <div class="ckeditor_content" th:utext="${dto.content}"></div>
     </div>
 
     <div class="form-group">
@@ -153,6 +148,10 @@
         .uploadResult ul li{
 
             margin-left: 20px;
+        }
+
+        img{
+            width: 100%;
         }
 
 

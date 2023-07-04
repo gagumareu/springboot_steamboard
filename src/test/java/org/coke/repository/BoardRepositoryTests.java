@@ -28,7 +28,7 @@ public class BoardRepositoryTests {
     @Test
     public void insertBoardWithImages(){
 
-        IntStream.rangeClosed(1, 100).forEach( i -> {
+        IntStream.rangeClosed(1, 300).forEach( i -> {
 
             Member member = Member.builder().email("user" +(int)((Math.random() * 99) +1) + "@email.com").build();
 

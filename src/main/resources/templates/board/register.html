@@ -23,15 +23,17 @@
             </div>
             <script>
 
+                var editorData = [];
+
                 ClassicEditor
                     .create( document.querySelector( '#editor' ),{
                         language: "ko",
                         ckfinder: {
                             uploadUrl : '/ckeditor',
-                            uploaded: true
-                            // options: {
-                            //     resourceType: 'Images'
-                            // }
+                            uploaded: true,
+                            options: {
+                                resourceType: 'Images'
+                            }
                         }
                     } )
                     .then(editor => {
